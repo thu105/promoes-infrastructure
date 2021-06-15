@@ -62,6 +62,7 @@ module "gke" {
   horizontal_pod_autoscaling = true
   network_policy             = false
   create_service_account     = true
+  zones                      = ["us-central1-a", "us-central1-b", "us-central1-f"]
 
   node_pools = [
     {
