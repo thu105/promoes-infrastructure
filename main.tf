@@ -62,7 +62,7 @@ module "gke" {
   horizontal_pod_autoscaling = true
   network_policy             = false
   create_service_account     = true
-  zones                      = ["us-central1-a", "us-central1-b", "us-central1-f"]
+  zones                      = ["us-central1-c"]
 
   node_pools = [
     {
@@ -73,7 +73,7 @@ module "gke" {
       local_ssd_count           = 0
       disk_size_gb              = 50
       disk_type                 = "pd-standard"
-      image_type                = "COS"
+      image_type                = "cos_containerd"
       auto_repair               = true
       auto_upgrade              = true
       preemptible               = false
