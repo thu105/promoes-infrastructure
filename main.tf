@@ -12,3 +12,9 @@ provider "google" {
   region  = "us-central1"
   zone    = "us-central1-c"
 }
+
+module "kubernetes-engine" {
+  source  = "terraform-google-modules/kubernetes-engine/google"
+  version = "15.0.0"
+  # insert the 9 required variables here
+}
