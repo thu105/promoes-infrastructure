@@ -77,7 +77,7 @@ module "gke" {
       auto_repair               = true
       auto_upgrade              = true
       preemptible               = false
-      initial_node_count        = 3
+      initial_node_count        = 2
     },
   ]
 
