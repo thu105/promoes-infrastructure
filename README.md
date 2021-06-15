@@ -25,11 +25,7 @@ Provision Promoes infrastructure onto Google Cloud Platform
    ```
    terraform init
    ```
-6. Set variables.
-   ```
-   sed -i "s/{{YOUR GCP PROJECT}}/promoes/" main.tf
-   ```
-7. Apply Terraform.
+6. Apply Terraform.
    ```
    terraform apply
    ```
