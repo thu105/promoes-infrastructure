@@ -52,7 +52,7 @@ module "gke" {
   source                     = "terraform-google-modules/kubernetes-engine/google"
   project_id                 = var.project_id
   name                       = var.cluster_name
-  regional                   = true
+  regional                   = false
   region                     = var.region
   network                    = module.gcp-network.network_name
   subnetwork                 = module.gcp-network.subnets_names[0]
