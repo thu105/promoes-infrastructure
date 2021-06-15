@@ -4,6 +4,10 @@ terraform {
       source = "hashicorp/google"
       version = "3.72.0"
     }
+    kubernetes = {
+      source = "hashicorp/kubernetes"
+      version = "2.3.2"
+    }
   }
 }
 
@@ -62,13 +66,13 @@ module "gke" {
   horizontal_pod_autoscaling = true
   network_policy             = false
   create_service_account     = true
-  zones                      = ["us-central1-c"]
+  zones                      = [var.zone]
 
   node_pools = [
     {
       name                      = "default-node-pool"
       machine_type              = "e2-medium"
-      min_count                 = 1
+      min_count                 = 0
       max_count                 = 3
       local_ssd_count           = 0
       disk_size_gb              = 50
