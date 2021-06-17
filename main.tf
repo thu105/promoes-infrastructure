@@ -29,13 +29,13 @@ provider "kubernetes" {
 # Create vpc-network and setup network peering
 resource "google_compute_network" "vpc_network" {
   provider = google
-  name = "vpc-network"
+  name = var.network_name
 }
   
 resource "google_compute_global_address" "vpc_peering_address" {
   provider = google
 
-  name          = "vpc-peering-address"
+  name          = var.peering_address_name
   purpose       = "VPC_PEERING"
   address_type  = "INTERNAL"
   prefix_length = 16
@@ -57,8 +57,8 @@ module "gke" {
   name                       = var.cluster_name
   regional                   = false
   region                     = var.region
-  network                    = google_compute_network.vpc_network.name
-  subnetwork                 = google_compute_network.vpc_network.name
+  network                    = google_compute_network.vpc_network.id
+  subnetwork                 = google_compute_network.vpc_network.id
   http_load_balancing        = false
   horizontal_pod_autoscaling = true
   network_policy             = false
@@ -135,7 +135,7 @@ resource "random_id" "db_name_suffix" {
 resource "google_sql_database_instance" "kong_sql" {
   provider = google
 
-  name   = "kong-instance-${random_id.db_name_suffix.hex}"
+  name   = "kong-sql-${random_id.db_name_suffix.hex}"
   database_version = "POSTGRES_13"
   region = var.region
 
