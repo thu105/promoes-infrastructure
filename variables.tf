@@ -18,7 +18,12 @@ variable "zone" {
   default     = "us-central1-c"
 }
 
-variable "network" {
+variable "network_name" {
   description = "The VPC network created to host the cluster in"
   default     = "vpc-network"
+}
+
+variable "peering_address_name" {
+  description = "The VPC network address name for peering"
+  default     = "vpc-peering-address"
 }
