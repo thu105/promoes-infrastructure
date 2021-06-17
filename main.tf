@@ -130,14 +130,9 @@ module "gke" {
 }
 
 # Create private POSTGRES SQL instance for Kong
-resource "random_id" "db_name_suffix" {
-  byte_length = 4
-}
-
 resource "google_sql_database_instance" "kong_sql" {
   provider = google
 
-  name   = "kong-sql-${random_id.db_name_suffix.hex}"
   database_version = "POSTGRES_13"
   region = var.region
 
