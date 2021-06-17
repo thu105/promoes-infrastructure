@@ -165,7 +165,7 @@ resource "google_sql_database_instance" "kong_sql" {
     tier = "db-f1-micro"
     ip_configuration {
       ipv4_enabled    = false
-      private_network = module.gcp-network.network
+      private_network = module.gcp-network.network_self_link
     }
     availability_type = "ZONAL"
     
