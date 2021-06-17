@@ -158,19 +158,28 @@ resource "random_id" "db_name_suffix" {
   byte_length = 4
 }
 
-resource "google_sql_database_instance" "instance" {
+resource "google_sql_database_instance" "test" {
   provider = google
 
   name   = "private-instance-${random_id.db_name_suffix.hex}"
+  database_version = "POSTGRES_13"
   region = var.region
 
   depends_on = [google_service_networking_connection.private_vpc_connection]
-
+  deletion_protection = false
+  
   settings {
     tier = "db-f1-micro"
     ip_configuration {
       ipv4_enabled    = false
       private_network = google_compute_network.private_network.id
     }
+    availability_type = "ZONAL"
+    
   }
+}
+resource "google_sql_user" "users" {
+  name     = "kong"
+  instance = google_sql_database_instance.test.name
+  password = "kong"
 }
