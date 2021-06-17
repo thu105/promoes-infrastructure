@@ -28,20 +28,10 @@ output "cluster_name" {
 
 output "network_name" {
   description = "The name of the VPC being created"
-  value       = module.gcp-network.network_name
-}
-
-output "subnet_name" {
-  description = "The name of the subnet being created"
-  value       = module.gcp-network.subnets_names
-}
-
-output "subnet_secondary_ranges" {
-  description = "The secondary ranges associated with the subnet"
-  value       = module.gcp-network.subnets_secondary_ranges
+  value       = google_compute_network.vpc_network.name
 }
   
 output "sql_instance_name" {
   description = "The name of the Postgres SQL Server being created"
-  value       = google_sql_database_instance.test.name 
+  value       = google_sql_database_instance.kong_sql.name 
 }
