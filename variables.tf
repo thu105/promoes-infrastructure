@@ -23,6 +23,11 @@ variable "network_name" {
   default     = "vpc-network"
 }
 
+variable "subnetwork_name" {
+  description = "The subnetwork created to host the cluster in"
+  default     = "vpc-subnet"
+}
+
 variable "ip_range_pods_name" {
   description = "The secondary ip range to use for pods"
   default     = "ip-range-pods"
