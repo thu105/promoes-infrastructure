@@ -61,13 +61,13 @@ resource "google_compute_global_address" "vpc_peering_address" {
   purpose       = "VPC_PEERING"
   address_type  = "INTERNAL"
   prefix_length = 16
-  network       = module.gcp-network.network
+  network       = module.gcp-network.network_name
 }
   
 resource "google_service_networking_connection" "private_vpc_connection" {
   provider = google
 
-  network                 = module.gcp-network.network
+  network                 = module.gcp-network.network_name
   service                 = "servicenetworking.googleapis.com"
   reserved_peering_ranges = [google_compute_global_address.vpc_peering_address.name]
 }
