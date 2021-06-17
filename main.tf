@@ -1,3 +1,4 @@
+# Delcare required providers
 terraform {
   required_providers {
     google = {
@@ -25,43 +26,39 @@ provider "kubernetes" {
   cluster_ca_certificate = base64decode(module.gke.ca_certificate)
 }
 
-module "gcp-network" {
-  source       = "terraform-google-modules/network/google"
-  project_id   = var.project_id
-  network_name = var.network
+# Create vpc-network and setup network peering
+resource "google_compute_network" "vpc_network" {
+  provider = google
+  name = "vpc-network"
+}
+  
+resource "google_compute_global_address" "vpc_peering_address" {
+  provider = google
 
-  subnets = [
-    {
-      subnet_name   = var.subnetwork
-      subnet_ip     = "10.0.0.0/17"
-      subnet_region = var.region
-    },
-  ]
+  name          = "vpc-peering-address"
+  purpose       = "VPC_PEERING"
+  address_type  = "INTERNAL"
+  prefix_length = 16
+  network       = google_compute_network.vpc_network.id
+}
+  
+resource "google_service_networking_connection" "private_vpc_connection" {
+  provider = google
 
-  secondary_ranges = {
-    (var.subnetwork) = [
-      {
-        range_name    = var.ip_range_pods_name
-        ip_cidr_range = "192.168.0.0/18"
-      },
-      {
-        range_name    = var.ip_range_services_name
-        ip_cidr_range = "192.168.64.0/18"
-      },
-    ]
-  }
+  network                 = google_compute_network.vpc_network.id
+  service                 = "servicenetworking.googleapis.com"
+  reserved_peering_ranges = [google_compute_global_address.vpc_peering_address.name]
 }
 
+# Create GKE Cluster
 module "gke" {
   source                     = "terraform-google-modules/kubernetes-engine/google"
   project_id                 = var.project_id
   name                       = var.cluster_name
   regional                   = false
   region                     = var.region
-  network                    = module.gcp-network.network_name
-  subnetwork                 = module.gcp-network.subnets_names[0]
-  ip_range_pods              = var.ip_range_pods_name
-  ip_range_services          = var.ip_range_services_name
+  network                    = google_compute_network.vpc_network.name
+  subnetwork                 = google_compute_network.vpc_network.name
   http_load_balancing        = false
   horizontal_pod_autoscaling = true
   network_policy             = false
@@ -129,39 +126,16 @@ module "gke" {
     ]
   }
 }
-    
-resource "google_compute_network" "private_network" {
-  provider = google
 
-  name = "private-network"
-}
-
-resource "google_compute_global_address" "private_ip_address" {
-  provider = google
-
-  name          = "private-ip-address"
-  purpose       = "VPC_PEERING"
-  address_type  = "INTERNAL"
-  prefix_length = 16
-  network       = google_compute_network.private_network.id
-}
-
-resource "google_service_networking_connection" "private_vpc_connection" {
-  provider = google
-
-  network                 = google_compute_network.private_network.id
-  service                 = "servicenetworking.googleapis.com"
-  reserved_peering_ranges = [google_compute_global_address.private_ip_address.name]
-}
-
+# Create private POSTGRES SQL instance for Kong
 resource "random_id" "db_name_suffix" {
   byte_length = 4
 }
 
-resource "google_sql_database_instance" "test" {
+resource "google_sql_database_instance" "kong_instance" {
   provider = google
 
-  name   = "private-instance-${random_id.db_name_suffix.hex}"
+  name   = "kong-instance-${random_id.db_name_suffix.hex}"
   database_version = "POSTGRES_13"
   region = var.region
 
@@ -172,14 +146,15 @@ resource "google_sql_database_instance" "test" {
     tier = "db-f1-micro"
     ip_configuration {
       ipv4_enabled    = false
-      private_network = google_compute_network.private_network.id
+      private_network = google_compute_network.vpc_network.id
     }
     availability_type = "ZONAL"
     
   }
 }
+  
 resource "google_sql_user" "users" {
   name     = "kong"
-  instance = google_sql_database_instance.test.name
+  instance = google_sql_database_instance.kong_instance.name
   password = "kong"
 }
