@@ -27,9 +27,31 @@ provider "kubernetes" {
 }
 
 # Create vpc-network and setup network peering
-resource "google_compute_network" "vpc_network" {
-  provider = google
-  name = var.network_name
+module "gcp-network" {
+  source       = "terraform-google-modules/network/google"
+  project_id   = var.project_id
+  network_name = var.network_name
+
+  subnets = [
+    {
+      subnet_name   = var.subnetwork_name
+      subnet_ip     = "10.0.0.0/17"
+      subnet_region = var.region
+    },
+  ]
+
+  secondary_ranges = {
+    (var.subnetwork_name) = [
+      {
+        range_name    = var.ip_range_pods_name
+        ip_cidr_range = "192.168.0.0/18"
+      },
+      {
+        range_name    = var.ip_range_services_name
+        ip_cidr_range = "192.168.64.0/18"
+      },
+    ]
+  }
 }
   
 resource "google_compute_global_address" "vpc_peering_address" {
@@ -39,13 +61,13 @@ resource "google_compute_global_address" "vpc_peering_address" {
   purpose       = "VPC_PEERING"
   address_type  = "INTERNAL"
   prefix_length = 16
-  network       = google_compute_network.vpc_network.id
+  network       = module.gcp-network.network_name
 }
   
 resource "google_service_networking_connection" "private_vpc_connection" {
   provider = google
 
-  network                 = google_compute_network.vpc_network.id
+  network                 = module.gcp-network.network_name
   service                 = "servicenetworking.googleapis.com"
   reserved_peering_ranges = [google_compute_global_address.vpc_peering_address.name]
 }
@@ -57,8 +79,8 @@ module "gke" {
   name                       = var.cluster_name
   regional                   = false
   region                     = var.region
-  network                    = google_compute_network.vpc_network.name
-  subnetwork                 = google_compute_network.vpc_network.name
+  network                    = module.gcp-network.network_name
+  subnetwork                 = module.gcp-network.subnets_names[0]
   ip_range_pods              = var.ip_range_pods_name
   ip_range_services          = var.ip_range_services_name
   http_load_balancing        = false
@@ -143,7 +165,7 @@ resource "google_sql_database_instance" "kong_sql" {
     tier = "db-f1-micro"
     ip_configuration {
       ipv4_enabled    = false
-      private_network = google_compute_network.vpc_network.id
+      private_network = module.gcp-network.network_name
     }
     availability_type = "ZONAL"
     
