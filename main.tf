@@ -59,6 +59,8 @@ module "gke" {
   region                     = var.region
   network                    = google_compute_network.vpc_network.id
   subnetwork                 = google_compute_network.vpc_network.id
+  ip_range_pods              = var.ip_range_pods_name
+  ip_range_services          = var.ip_range_services_name
   http_load_balancing        = false
   horizontal_pod_autoscaling = true
   network_policy             = false
