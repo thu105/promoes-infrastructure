@@ -57,8 +57,8 @@ module "gke" {
   name                       = var.cluster_name
   regional                   = false
   region                     = var.region
-  network                    = google_compute_network.vpc_network.id
-  subnetwork                 = google_compute_network.vpc_network.id
+  network                    = google_compute_network.vpc_network.name
+  subnetwork                 = google_compute_network.vpc_network.name
   ip_range_pods              = var.ip_range_pods_name
   ip_range_services          = var.ip_range_services_name
   http_load_balancing        = false
