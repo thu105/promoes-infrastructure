@@ -37,3 +37,8 @@ variable "ip_range_services_name" {
   description = "The secondary ip range to use for services"
   default     = "ip-range-svc"
 }
+
+variable "kong_db_secret_id" {
+  description = "Secret used for authentication with Kong DB"
+  default     = "kong-ps-password"
+}
