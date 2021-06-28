@@ -42,3 +42,9 @@ variable "kong_db_secret_id" {
   description = "Secret used for authentication with Kong DB"
   default     = "kong-ps-password"
 }
+
+variable "kong_db_secret_value" {
+  description = "Kong DB secret value"
+  type        = string
+  sensitive   = true
+}
