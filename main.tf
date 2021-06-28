@@ -26,7 +26,7 @@ provider "kubernetes" {
   cluster_ca_certificate = base64decode(module.gke.ca_certificate)
 }
 
-# Create vpc-network and setup network peering
+# Create gcp-network
 module "gcp-network" {
   source       = "terraform-google-modules/network/google"
   project_id   = var.project_id
@@ -52,24 +52,6 @@ module "gcp-network" {
       },
     ]
   }
-}
-  
-resource "google_compute_global_address" "vpc_peering_address" {
-  provider = google
-
-  name          = var.peering_address_name
-  purpose       = "VPC_PEERING"
-  address_type  = "INTERNAL"
-  prefix_length = 16
-  network       = module.gcp-network.network_name
-}
-  
-resource "google_service_networking_connection" "private_vpc_connection" {
-  provider = google
-
-  network                 = module.gcp-network.network_name
-  service                 = "servicenetworking.googleapis.com"
-  reserved_peering_ranges = [google_compute_global_address.vpc_peering_address.name]
 }
 
 # Create GKE Cluster
@@ -149,36 +131,4 @@ module "gke" {
       "default-node-pool",
     ]
   }
-}
-
-# Create private POSTGRES SQL instance for Kong
-resource "google_sql_database_instance" "kong_sql" {
-  provider = google
-
-  database_version = "POSTGRES_13"
-  region = var.region
-
-  depends_on = [google_service_networking_connection.private_vpc_connection]
-  deletion_protection = false
-  
-  settings {
-    tier = "db-f1-micro"
-    ip_configuration {
-      ipv4_enabled    = false
-      private_network = module.gcp-network.network_self_link
-    }
-    availability_type = "ZONAL"
-    
-  }
-}
-  
-resource "google_sql_database" "kong_db" {
-  name     = "kong"
-  instance = google_sql_database_instance.kong_sql.name
-}
-  
-resource "google_sql_user" "users" {
-  name     = "kong"
-  instance = google_sql_database_instance.kong_sql.name
-  password = "kong"
 }
