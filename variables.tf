@@ -48,3 +48,8 @@ variable "kong_db_secret_value" {
   type        = string
   sensitive   = true
 }
+
+variable "cloudbuild_config_bucket_name" {
+  description = "The name of Cloud Storage Bucket to store CloudBuild configs."
+  default     = "cloudbuild-config-bucket"
+}

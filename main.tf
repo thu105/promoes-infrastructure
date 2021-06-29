@@ -65,7 +65,7 @@ resource "google_secret_manager_secret_iam_member" "kong-secret-member" {
 }
 
 resource "google_storage_bucket" "cloudbuild-config" {
-  name          = "cloudbuild-config-bucket"
+  name          = var.cloudbuild_config_bucket_name
   force_destroy = true
 
   uniform_bucket_level_access = true
