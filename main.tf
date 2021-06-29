@@ -23,6 +23,16 @@ data "google_project" "project" {
   project_id = var.project_id
 }
 
+resource "google_project_service" "service-cloudbuild" {
+  project = var.project_id
+  service = "cloudbuild.googleapis.com"
+}
+
+resource "google_project_service" "service-secretmanager" {
+  project = var.project_id
+  service = "secretmanager.googleapis.com"
+}
+
 provider "kubernetes" {
   host                   = "https://${module.gke.endpoint}"
   token                  = data.google_client_config.default.access_token
