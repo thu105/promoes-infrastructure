@@ -89,7 +89,7 @@ module "gke" {
       name                      = "default-node-pool"
       machine_type              = "e2-medium"
       min_count                 = 0
-      max_count                 = 3
+      max_count                 = 0
       local_ssd_count           = 0
       disk_size_gb              = 100
       disk_type                 = "pd-standard"
