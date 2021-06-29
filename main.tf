@@ -39,6 +39,31 @@ resource "google_project_service" "service-secretmanager" {
   service = "secretmanager.googleapis.com"
 }
 
+resource "google_secret_manager_secret" "kong-secret" {
+  secret_id = var.kong_db_secret_id
+
+  labels = {
+    app = "kong"
+  }
+
+  replication {
+    automatic = true
+  }
+}
+
+resource "google_secret_manager_secret_version" "kong-secret-version" {
+  secret = google_secret_manager_secret.kong-secret.id
+
+  secret_data = var.kong_db_secret_value
+}
+
+resource "google_secret_manager_secret_iam_member" "kong-secret-member" {
+  project = google_secret_manager_secret.kong-secret.project
+  secret_id = google_secret_manager_secret.kong-secret.secret_id
+  role = "roles/secretmanager.secretAccessor"
+  member = "serviceAccount:${data.google_project.project.number}@cloudbuild.gserviceaccount.com"
+}
+
 provider "kubernetes" {
   host                   = "https://${module.gke.endpoint}"
   token                  = data.google_client_config.default.access_token

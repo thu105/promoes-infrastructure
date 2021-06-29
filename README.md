@@ -26,6 +26,10 @@ Provision Promoes infrastructure onto Google Cloud Platform
    ```
    export GOOGLE_APPLICATION_CREDENTIALS=tf-private-key.json
    ```
+6. Supply Kong DB Password to Terraform. (You can also set this later when you run `terraform apply` command in the later step.)
+   ```
+   export TF_VAR_kong_db_secret_value=LongAndSecurePassword
+   ```
 6. Initialize Terraform.
    ```
    terraform init
