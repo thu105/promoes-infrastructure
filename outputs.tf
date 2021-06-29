@@ -47,5 +47,5 @@ output "subnet_secondary_ranges" {
 
 output "cloudbuild_config_bucket_url" {
   description = "The base URL of the CloudBuild config bucket."
-  value       = google_storage_bucket.cloudbuild-config.URL
+  value       = google_storage_bucket.cloudbuild-config.url
 }
