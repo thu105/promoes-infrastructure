@@ -44,3 +44,8 @@ output "subnet_secondary_ranges" {
   description = "The secondary ranges associated with the subnet"
   value       = module.gcp-network.subnets_secondary_ranges
 }
+
+output "cloudbuild_config_bucket_url" {
+  description = "The base URL of the CloudBuild config bucket."
+  value       = google_storage_bucket.cloudbuild-config.URL
+}

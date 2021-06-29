@@ -64,6 +64,16 @@ resource "google_secret_manager_secret_iam_member" "kong-secret-member" {
   member = "serviceAccount:${data.google_project.project.number}@cloudbuild.gserviceaccount.com"
 }
 
+resource "google_storage_bucket" "cloudbuild-config" {
+  name          = "cloudbuild-config-bucket"
+  force_destroy = true
+
+  uniform_bucket_level_access = true
+  labels = {
+    service = "cloudbuild"
+  }
+}
+
 provider "kubernetes" {
   host                   = "https://${module.gke.endpoint}"
   token                  = data.google_client_config.default.access_token
