@@ -40,7 +40,7 @@ variable "ip_range_services_name" {
 
 variable "kong_db_secret_id" {
   description = "Secret used for authentication with Kong DB"
-  default     = "kong-ps-password"
+  default     = "kong-pg-password"
 }
 
 variable "kong_db_secret_value" {
