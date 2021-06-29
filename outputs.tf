@@ -16,6 +16,10 @@ output "ca_certificate" {
   value       = module.gke.ca_certificate
 }
 
+output "project_number" {
+  value = data.google_project.project.number
+}
+
 output "service_account" {
   description = "The default service account used for running nodes."
   value       = module.gke.service_account
