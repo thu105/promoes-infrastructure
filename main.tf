@@ -33,6 +33,11 @@ resource "google_project_iam_member" "iam-cloudbuild-container" {
   role    = "roles/container.developer"
   member  = "serviceAccount:${data.google_project.project.number}@cloudbuild.gserviceaccount.com"
 }
+resource "google_project_iam_member" "iam-cloudbuild-containerclusterrole" {
+  project = var.project_id
+  role    = "roles/container.clusterRoles.create"
+  member  = "serviceAccount:${data.google_project.project.number}@cloudbuild.gserviceaccount.com"
+}
 
 resource "google_project_service" "service-secretmanager" {
   project = var.project_id
