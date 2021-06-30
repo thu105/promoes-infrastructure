@@ -30,12 +30,7 @@ resource "google_project_service" "service-cloudbuild" {
 
 resource "google_project_iam_member" "iam-cloudbuild-container" {
   project = var.project_id
-  role    = "roles/container.developer"
-  member  = "serviceAccount:${data.google_project.project.number}@cloudbuild.gserviceaccount.com"
-}
-resource "google_project_iam_member" "iam-cloudbuild-containerclusterrole" {
-  project = var.project_id
-  role    = "roles/container.clusterRoles.create"
+  role    = "roles/container.admin"
   member  = "serviceAccount:${data.google_project.project.number}@cloudbuild.gserviceaccount.com"
 }
 
